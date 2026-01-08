@@ -35,3 +35,4 @@ export function useDarkMode() {
 
   return { isDark, toggleDarkMode, mounted }
 }
+export default useDarkMode

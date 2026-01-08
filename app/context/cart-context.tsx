@@ -1,37 +1,58 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { createContext, useContext, useState, type ReactNode } from "react"
 
-export function useDarkMode() {
-  const [isDark, setIsDark] = useState(false)
-  const [mounted, setMounted] = useState(false)
+interface CartItem {
+  productId: number
+  quantity: number
+  size: string
+}
 
-  useEffect(() => {
-    setMounted(true)
-    // Check if dark mode is enabled in localStorage or system preference
-    const isDarkMode =
-      localStorage.getItem("darkMode") === "true" ||
-      (!localStorage.getItem("darkMode") && window.matchMedia("(prefers-color-scheme: dark)").matches)
+interface CartContextType {
+  items: CartItem[]
+  addItem: (productId: number) => void
+  updateItem: (index: number, quantity: number, size: string) => void
+  removeItem: (index: number) => void
+  clearCart: () => void
+  getTotalItems: () => number
+}
 
-    setIsDark(isDarkMode)
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
-  }, [])
+const CartContext = createContext<CartContextType | undefined>(undefined)
 
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDark
-    setIsDark(newDarkMode)
-    localStorage.setItem("darkMode", newDarkMode ? "true" : "false")
+export function CartProvider({ children }: { children: ReactNode }) {
+  const [items, setItems] = useState<CartItem[]>([])
 
-    if (newDarkMode) {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
+  const addItem = (productId: number) => {
+    setItems([...items, { productId, quantity: 1, size: "" }])
   }
 
-  return { isDark, toggleDarkMode, mounted }
+  const updateItem = (index: number, quantity: number, size: string) => {
+    const newItems = [...items]
+    newItems[index] = { ...newItems[index], quantity, size }
+    setItems(newItems)
+  }
+
+  const removeItem = (index: number) => {
+    setItems(items.filter((_, i) => i !== index))
+  }
+
+  const clearCart = () => {
+    setItems([])
+  }
+
+  const getTotalItems = () => items.reduce((sum, item) => sum + item.quantity, 0)
+
+  return (
+    <CartContext.Provider value={{ items, addItem, updateItem, removeItem, clearCart, getTotalItems }}>
+      {children}
+    </CartContext.Provider>
+  )
+}
+
+export function useCart() {
+  const context = useContext(CartContext)
+  if (!context) {
+    throw new Error("useCart must be used within CartProvider")
+  }
+  return context
 }
