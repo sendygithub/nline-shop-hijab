@@ -1,65 +1,190 @@
-import Image from "next/image";
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Header from "@/components/header"
+import CategoryFilter from "@/components/category-filter"
+import ProductCard from "@/components/product-card"
+import { useCart } from "@/app/context/cart-context"
+
+const products = [
+  {
+    id: 1,
+    name: "Hijab Voile Premium",
+    category: "Hijab",
+    price: 89000,
+    description: "Hijab voile halus dengan finishing sempurna, nyaman dipakai sepanjang hari",
+    image: "/modern-hijab-voile-pink.jpg",
+    rating: 4.8,
+  },
+  {
+    id: 2,
+    name: "Gamis Syari Panjang",
+    category: "Gamis",
+    price: 189000,
+    description: "Gamis syari dengan potongan elegan dan bahan berkualitas premium",
+    image: "/islamic-dress-gamis-women.jpg",
+    rating: 4.9,
+  },
+  {
+    id: 3,
+    name: "Tunik Muslimah Modern",
+    category: "Tunik",
+    price: 129000,
+    description: "Tunik muslimah dengan desain kontemporer dan warna-warna cerah",
+    image: "/modest-clothing-tunic-white.jpg",
+    rating: 4.7,
+  },
+  {
+    id: 4,
+    name: "Pashmina Motif Bunga",
+    category: "Pashmina",
+    price: 79000,
+    description: "Pashmina premium dengan motif bunga tradisional yang cantik",
+    image: "/pashmina-floral-pattern.jpg",
+    rating: 4.6,
+  },
+  {
+    id: 5,
+    name: "Abaya Arab Klasik",
+    category: "Abaya",
+    price: 249000,
+    description: "Abaya arab asli dengan jahitan rapi dan bahan terbaik",
+    image: "/abaya-arabian-dress-black-elegant.jpg",
+    rating: 5,
+  },
+  {
+    id: 6,
+    name: "Jilbab Segi Empat",
+    category: "Jilbab",
+    price: 69000,
+    description: "Jilbab segi empat dengan kualitas terjamin dan harga terjangkau",
+    image: "/square-hijab-jilbab-islamic.jpg",
+    rating: 4.8,
+  },
+  {
+    id: 7,
+    name: "Dress Muslimah Pesta",
+    category: "Gamis",
+    price: 199000,
+    description: "Dress pesta muslimah dengan bordiran cantik untuk acara spesial",
+    image: "/islamic-party-dress-embroidered.jpg",
+    rating: 4.9,
+  },
+  {
+    id: 8,
+    name: "Inner Hijab Berkualitas",
+    category: "Aksesori",
+    price: 49000,
+    description: "Inner hijab yang nyaman dengan bahan breathable dan elastis",
+    image: "/hijab-inner-cap-accessory.jpg",
+    rating: 4.7,
+  },
+]
+
+const categories = ["Semua", "Hijab", "Gamis", "Tunik", "Pashmina", "Abaya", "Jilbab", "Aksesori"]
 
 export default function Home() {
+  const router = useRouter()
+  const { addItem } = useCart()
+  const [selectedCategory, setSelectedCategory] = useState("Semua")
+  const [favorites, setFavorites] = useState<number[]>([])
+
+  const filteredProducts =
+    selectedCategory === "Semua" ? products : products.filter((p) => p.category === selectedCategory)
+
+  const toggleFavorite = (id: number) => {
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]))
+  }
+
+  const handleAddToCart = (productId: number) => {
+    addItem(productId)
+    router.push("/checkout")
+  }
+
+  const handleNavigateCart = () => {
+    router.push("/checkout")
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="min-h-screen bg-background">
+      <Header onNavigateCart={handleNavigateCart} />
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Welcome Section */}
+        <div className="mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2 text-balance">Hijab Paradise</h1>
+          <p className="text-lg text-muted-foreground">
+            Koleksi pakaian muslim modern dengan kualitas terbaik dan harga terjangkau
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        {/* Category Filter */}
+        <CategoryFilter
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {filteredProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              isFavorite={favorites.includes(product.id)}
+              onToggleFavorite={() => toggleFavorite(product.id)}
+              onAddToCart={() => handleAddToCart(product.id)}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          ))}
         </div>
-      </main>
-    </div>
-  );
+
+        {filteredProducts.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-lg text-muted-foreground">Tidak ada produk di kategori ini</p>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-secondary text-foreground py-8 mt-16">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="font-bold text-lg mb-4">Hijab Paradise</h3>
+              <p className="text-muted-foreground">Toko online pakaian muslim terpercaya sejak 2023</p>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Layanan</h4>
+              <ul className="space-y-2 text-muted-foreground">
+                <li>
+                  <a href="#" className="hover:text-primary">
+                    Pengiriman Gratis
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-primary">
+                    Garansi Kualitas
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-primary">
+                    Tukar Balik
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Hubungi Kami</h4>
+              <p className="text-muted-foreground">WhatsApp: +62 812 3456 7890</p>
+              <p className="text-muted-foreground">Email: info@hijabparadise.com</p>
+            </div>
+          </div>
+          <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
+            <p>&copy; 2026 Hijab Paradise. Semua hak dilindungi.</p>
+          </div>
+        </div>
+      </footer>
+    </main>
+  )
 }
